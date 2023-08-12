@@ -1,5 +1,7 @@
-import React, { useRef } from "react";
+import axios from "axios";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
+import { toast } from "react-toastify";
 
 const FormContainer = styled.form`
     display: flex;
@@ -23,7 +25,7 @@ const Input = styled.input`
     width: 120px;
     padding: 0 10px;
     border: 1px solid #bbb;
-    border-raius: 5px;
+    border-radius: 5px;
     height: 40px;
 `;
 
@@ -37,10 +39,61 @@ const Button = styled.button`
     height: 42px;
 `;
 
-const Form = ({ onEdit }) => {
+const Form = ({ getUsers, onEdit, setOnEdit }) => {
     const ref = useRef();
+
+    useEffect(()=>{
+        if (onEdit){
+            const user = ref.current;
+
+            user.nome.value = onEdit.nome;
+            user.email.value = onEdit.email;
+            user.data_nas.value = onEdit.data_nas;
+        }
+    }, [onEdit]);
+
+    const handleSubmit = async (e) =>{
+        e.preventDefault();
+
+        const user = ref.current;
+
+        if (
+            !user.nome.value ||
+            !user.email.value||
+            !user.data_nas.value
+        ){
+            return toast.warn("Preencha todos os campos!");
+        }
+
+        if (onEdit){
+            await axios
+                .put("http://localhost:500/" + onEdit.id, {
+                    nome: user.nome.value,
+                    email: user.email.value,
+                    data_nas: user.data_nas.value
+                })
+                .then(({data}) =>toast.success(data))
+                .catch(({data}) => toast.error(data));
+        } else {
+            await axios
+                .post("http://localhost:500", {
+                    nome: user.nome.value,
+                    email: user.email.value,
+                    data_nas: user.data_nas.value,
+                })
+                .then(({data}) => toast.success(data))
+                .catch(({data}) => toast.error(data));
+        }
+        user.nome.value = "";
+        user.email.value= "" ;
+        user.data_nas.value="";
+
+        setOnEdit(null);
+        getUsers();
+    };
+
     return(
-        <FormContainer ref={ref}>
+        <FormContainer ref={ref} onSubmit={handleSubmit}>
             <InputArea>
                 <Label>Nome</Label>
                 <Input name="nome"/>

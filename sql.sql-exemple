@@ -6,7 +6,7 @@ create table dados(
 id INT auto_increment not null,
 nome VARCHAR(200),
 email VARCHAR(200),
-data_nas date,
+data_nas VARCHAR(200),
 primary key(id)
 );
 

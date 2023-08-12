@@ -10,7 +10,8 @@ export const getUsers = (_, res)=>{
 };
 
 export const addUser = (req, res) => {
-    const q = "INSERT INTO dados('nome', 'email', 'data_nas') values(?)";
+    const q = "INSERT INTO dados(nome, email, data_nas) VALUES (?)";
+
 
     const values = [
         req.body.nome,
